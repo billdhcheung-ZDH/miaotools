@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON 格式化 - 在线JSON美化压缩校验工具 | 妙用工具</title>
+  <meta name="description" content="免费在线 JSON 格式化工具，一键美化、压缩、校验 JSON 数据，自动定位语法错误，支持树形预览。开发者必备，本地处理。">
+  <meta name="keywords" content="JSON格式化,JSON美化,JSON压缩,JSON校验,在线JSON,JSON解析">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://example.com/tools/json-formatter.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"JSON 格式化","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 开发工具 / JSON 格式化</div>
+    <h1><span class="th-icon">📄</span>JSON 格式化</h1>
+    <p class="sub">美化、压缩、校验 JSON，自动定位错误，开发调试好帮手。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div class="btn-row" style="margin-top:0;margin-bottom:14px">
+      <button class="btn btn-primary" id="fmtBtn">美化格式</button>
+      <button class="btn btn-soft" id="minBtn">压缩</button>
+      <button class="btn btn-soft" id="valBtn">校验</button>
+      <button class="btn btn-ghost" id="copyBtn">复制</button>
+      <button class="btn btn-ghost" id="dlBtn">下载</button>
+      <button class="btn btn-ghost" id="clearBtn">清空</button>
+    </div>
+
+    <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <label>输入 JSON</label>
+        <textarea class="textarea" id="input" rows="14" placeholder='粘贴 JSON 数据，例如 {"name":"妙用工具","free":true}'>{"name":"妙用工具","free":true,"tools":["二维码","图片压缩"],"count":10}</textarea>
+      </div>
+      <div>
+        <label>输出结果</label>
+        <textarea class="textarea" id="output" rows="14" readonly placeholder="格式化结果将显示在这里"></textarea>
+      </div>
+    </div>
+
+    <div id="status" class="output-box empty" style="margin-top:16px">状态：等待输入</div>
+
+    <div class="field" style="margin-top:18px">
+      <label>缩进</label>
+      <select class="select" id="indent" style="max-width:200px">
+        <option value="2" selected>2 空格</option>
+        <option value="4">4 空格</option>
+        <option value="\t">Tab</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>JSON 格式化工具说明</h2>
+    <p>JSON（JavaScript Object Notation）是一种轻量级的数据交换格式，广泛用于 API 接口、配置文件、数据存储等场景。本工具帮助你快速美化、压缩和校验 JSON 数据。</p>
+    <h3>功能介绍</h3>
+    <ul>
+      <li><strong>美化格式</strong>：为压缩的 JSON 添加缩进和换行，便于阅读。</li>
+      <li><strong>压缩</strong>：移除所有空白字符，减小 JSON 体积，适合传输。</li>
+      <li><strong>校验</strong>：检查 JSON 语法是否正确，定位错误位置。</li>
+      <li><strong>复制 / 下载</strong>：一键复制结果或保存为 .json 文件。</li>
+    </ul>
+    <h3>常见 JSON 错误</h3>
+    <ul>
+      <li>使用了单引号，JSON 标准要求双引号。</li>
+      <li>键名未加引号。</li>
+      <li>多余的逗号（末尾逗号）。</li>
+      <li>使用了注释（JSON 不支持注释）。</li>
+    </ul>
+    <h3>安全说明</h3>
+    <p>所有解析和格式化均在浏览器本地完成，数据不会上传服务器，可安全处理敏感配置。</p>
+  </div>
+</section>
+
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var input=document.getElementById('input'),output=document.getElementById('output'),
+      indent=document.getElementById('indent'),status=document.getElementById('status'),
+      fmtBtn=document.getElementById('fmtBtn'),minBtn=document.getElementById('minBtn'),valBtn=document.getElementById('valBtn'),
+      copyBtn=document.getElementById('copyBtn'),dlBtn=document.getElementById('dlBtn'),clearBtn=document.getElementById('clearBtn');
+
+  function getIndent(){var v=indent.value;return v==='\\t'?'\t':parseInt(v);}
+
+  function setStatus(cls,msg){
+    status.className='output-box'+(cls?'':' empty');
+    status.textContent=msg;
+    status.style.color=cls==='err'?'var(--red)':(cls==='ok'?'var(--green)':'');
+    status.style.fontFamily=cls?'var(--mono)':'var(--font)';
+  }
+
+  function parse(v){
+    return JSON.parse(v);
+  }
+
+  fmtBtn.addEventListener('click',function(){
+    var v=input.value.trim();
+    if(!v){setStatus('','状态：请输入 JSON');return;}
+    try{
+      var obj=parse(v);
+      output.value=JSON.stringify(obj,null,getIndent());
+      setStatus('ok','✓ 格式化成功 · '+countInfo(obj));
+    }catch(e){handleErr(e);}
+  });
+
+  minBtn.addEventListener('click',function(){
+    var v=input.value.trim();
+    if(!v){setStatus('','状态：请输入 JSON');return;}
+    try{
+      var obj=parse(v);
+      output.value=JSON.stringify(obj);
+      setStatus('ok','✓ 压缩成功 · 原始 '+v.length+' 字符 → '+output.value.length+' 字符');
+    }catch(e){handleErr(e);}
+  });
+
+  valBtn.addEventListener('click',function(){
+    var v=input.value.trim();
+    if(!v){setStatus('','状态：请输入 JSON');return;}
+    try{parse(v);setStatus('ok','✓ JSON 语法正确');}
+    catch(e){handleErr(e);}
+  });
+
+  function handleErr(e){
+    var msg=e.message;
+    var m=msg.match(/position (\d+)/i);
+    var pos=m?parseInt(m[1]):-1;
+    var hint='';
+    if(pos>=0){
+      var v=input.value;
+      var before=v.substring(0,pos);
+      var line=before.split('\n').length;
+      var col=pos-before.lastIndexOf('\n');
+      hint=' · 第 '+line+' 行，第 '+col+' 列附近';
+      var around=v.substring(Math.max(0,pos-15),pos+15);
+      hint+='\n  …'+around+'…';
+    }
+    setStatus('err','❌ 解析失败：'+msg+hint);
+  }
+
+  function countInfo(obj){
+    var t=Array.isArray(obj)?'array':'object';
+    var keys=t==='array'?obj.length:Object.keys(obj).length;
+    return t+'，'+keys+' '+(t==='array'?'项':'键');
+  }
+
+  copyBtn.addEventListener('click',function(){if(output.value)copyText(output.value,copyBtn);else toast('请先格式化');});
+  dlBtn.addEventListener('click',function(){if(output.value)downloadText('data.json',output.value);else toast('请先格式化');});
+  clearBtn.addEventListener('click',function(){input.value='';output.value='';setStatus('','状态：等待输入');});
+})();
+</script>
+</body>
+</html>

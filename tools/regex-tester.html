@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>正则表达式测试 - 在线正则匹配调试工具 | 妙用工具</title>
+  <meta name="description" content="免费在线正则表达式测试工具，实时匹配高亮，支持全局/忽略大小写/多行等标志，显示匹配数量与分组，开发调试利器。">
+  <meta name="keywords" content="正则表达式,正则测试,正则匹配,regex,正则调试,在线正则">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://example.com/tools/regex-tester.html">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .regex-match{background:#fff3cd;border-radius:3px;padding:0 2px;}
+    .regex-match.g1{background:#d1e7dd;}
+    .regex-match.g2{background:#cff4fc;}
+    .regex-hl{background:#ffe5e5;}
+  </style>
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 开发工具 / 正则表达式测试</div>
+    <h1><span class="th-icon">🔣</span>正则表达式测试</h1>
+    <p class="sub">实时匹配高亮，支持标志位与分组，开发调试利器。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div class="field">
+      <label>正则表达式</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <span class="muted" style="line-height:42px">/</span>
+        <input type="text" class="input mono" id="pattern" value="\b(\w+)@(\w+)\.(\w+)\b" style="flex:1;font-size:15px">
+        <span class="muted" style="line-height:42px">/</span>
+        <input type="text" class="input mono" id="flags" value="g" style="width:90px;text-align:center" placeholder="gim">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>标志位</label>
+      <div class="check-grid">
+        <label class="check-pill active"><input type="checkbox" id="fG" checked>g 全局</label>
+        <label class="check-pill"><input type="checkbox" id="fI">i 忽略大小写</label>
+        <label class="check-pill"><input type="checkbox" id="fM">m 多行</label>
+        <label class="check-pill"><input type="checkbox" id="fS">s . 匹配换行</label>
+        <label class="check-pill"><input type="checkbox" id="fU">u Unicode</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>测试文本</label>
+      <textarea class="textarea" id="text" rows="6">联系我：alice@example.com 或 bob@test.org
+也可以发到 admin@my-site.com</textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="testBtn">执行匹配</button>
+      <button class="btn btn-ghost" id="clearBtn">清空</button>
+    </div>
+
+    <div class="result-stats">
+      <div class="stat"><div class="n" id="matchCount">0</div><div class="l">匹配数</div></div>
+    </div>
+
+    <div class="field" style="margin-top:18px">
+      <label>高亮结果</label>
+      <div class="output-box" id="highlight" style="min-height:60px;white-space:pre-wrap"></div>
+    </div>
+
+    <div class="field">
+      <label>匹配详情</label>
+      <div class="output-box" id="details" style="min-height:50px">点击“执行匹配”查看详情</div>
+    </div>
+
+    <div id="errBox" class="output-box hidden" style="color:var(--red);margin-top:14px"></div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>正则表达式测试说明</h2>
+    <p>正则表达式（Regular Expression）是一种描述字符串模式的强大工具，广泛用于文本搜索、替换、验证等场景。本工具帮助你实时测试和调试正则表达式。</p>
+    <h3>常用标志位</h3>
+    <ul>
+      <li><strong>g</strong>：全局匹配，找出所有匹配项而非第一个。</li>
+      <li><strong>i</strong>：忽略大小写。</li>
+      <li><strong>m</strong>：多行模式，^ 和 $ 匹配每行开头结尾。</li>
+      <li><strong>s</strong>：使 . 能匹配换行符。</li>
+      <li><strong>u</strong>：Unicode 模式，正确处理中文等字符。</li>
+    </ul>
+    <h3>常用语法</h3>
+    <ul>
+      <li><code>\d</code> 数字，<code>\w</code> 字母数字下划线，<code>\s</code> 空白。</li>
+      <li><code>.</code> 任意字符，<code>*</code> 零次或多次，<code>+</code> 一次或多次，<code>?</code> 零或一次。</li>
+      <li><code>[abc]</code> 字符集，<code>(...)</code> 分组，<code>{n,m}</code> 重复次数。</li>
+      <li><code>^</code> 开头，<code>$</code> 结尾，<code>|</code> 或。</li>
+    </ul>
+  </div>
+</section>
+
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var pattern=document.getElementById('pattern'),flags=document.getElementById('flags'),text=document.getElementById('text'),
+      highlight=document.getElementById('highlight'),details=document.getElementById('details'),matchCount=document.getElementById('matchCount'),
+      errBox=document.getElementById('errBox'),
+      testBtn=document.getElementById('testBtn'),clearBtn=document.getElementById('clearBtn');
+  var flagBoxes={g:document.getElementById('fG'),i:document.getElementById('fI'),m:document.getElementById('fM'),s:document.getElementById('fS'),u:document.getElementById('fU')};
+
+  Object.keys(flagBoxes).forEach(function(k){flagBoxes[k].addEventListener('change',function(){syncFlags();test();});});
+  function syncFlags(){
+    var f='';Object.keys(flagBoxes).forEach(function(k){if(flagBoxes[k].checked)f+=k;});
+    flags.value=f;
+    Object.keys(flagBoxes).forEach(function(k){flagBoxes[k].closest('.check-pill').classList.toggle('active',flagBoxes[k].checked);});
+  }
+  flags.addEventListener('input',function(){
+    Object.keys(flagBoxes).forEach(function(k){flagBoxes[k].checked=flags.value.indexOf(k)>=0;flagBoxes[k].closest('.check-pill').classList.toggle('active',flagBoxes[k].checked);});
+  });
+
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function test(){
+    errBox.classList.add('hidden');
+    var p=pattern.value,f=flags.value,t=text.value;
+    if(!p){highlight.innerHTML=esc(t);details.textContent='请输入正则表达式';matchCount.textContent=0;return;}
+    var re;
+    try{re=new RegExp(p,f);}catch(e){errBox.textContent='❌ 正则语法错误：'+e.message;errBox.classList.remove('hidden');return;}
+
+    var matches=[],m;
+    if(f.indexOf('g')>=0){
+      while((m=re.exec(t))!==null){matches.push({match:m[0],index:m.index,groups:m.slice(1)});if(m.index===re.lastIndex)re.lastIndex++;}
+    }else{
+      m=re.exec(t);if(m)matches.push({match:m[0],index:m.index,groups:m.slice(1)});
+    }
+
+    matchCount.textContent=matches.length;
+
+    // 高亮
+    var html='',last=0;
+    matches.forEach(function(mt){
+      html+=esc(t.substring(last,mt.index));
+      html+='<span class="regex-match">'+esc(mt.match)+'</span>';
+      last=mt.index+mt.match.length;
+    });
+    html+=esc(t.substring(last));
+    highlight.innerHTML=html||esc(t);
+
+    // 详情
+    if(matches.length===0){details.textContent='未找到匹配项';return;}
+    var d=matches.map(function(mt,i){
+      var g=mt.groups.length?' · 分组: ['+mt.groups.map(function(x){return JSON.stringify(x);}).join(', ')+']':'';
+      return '#'+(i+1)+' "'+mt.match+'" @'+mt.index+g;
+    });
+    details.textContent=d.join('\n');
+  }
+
+  testBtn.addEventListener('click',test);
+  clearBtn.addEventListener('click',function(){text.value='';test();});
+  [pattern,flags,text].forEach(function(el){el.addEventListener('input',test);});
+
+  test();
+})();
+</script>
+</body>
+</html>

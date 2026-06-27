@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图片压缩 - 在线压缩JPG/PNG/WebP图片 | 妙用工具</title>
+  <meta name="description" content="免费在线图片压缩工具，支持 JPG、PNG、WebP 格式，可调节压缩质量和尺寸，大幅减小图片体积。本地处理，不上传服务器，保护隐私。">
+  <meta name="keywords" content="图片压缩,在线压缩图片,JPG压缩,PNG压缩,WebP压缩,图片缩小">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://example.com/tools/image-compress.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"图片压缩","applicationCategory":"UtilityApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 图片工具 / 图片压缩</div>
+    <h1><span class="th-icon">🖼️</span>图片压缩</h1>
+    <p class="sub">在线压缩 JPG / PNG / WebP 图片，自由调节质量与尺寸，全部本地处理。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div class="dropzone" id="dropzone">
+      <div class="dz-icon">📁</div>
+      <p>点击或拖拽图片到此处上传</p>
+      <p class="hint">支持 JPG、PNG、WebP · 最大 20MB · 本地处理不上传</p>
+      <input type="file" id="fileInput" accept="image/*" class="hidden">
+    </div>
+
+    <div id="controls" class="hidden">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0">
+        <div>
+          <label>压缩质量 <span class="muted">(0-100)</span></label>
+          <div class="range-row">
+            <input type="range" id="quality" min="10" max="100" value="75">
+            <span class="rv" id="qualityVal">75</span>
+          </div>
+        </div>
+        <div>
+          <label>最大边长 <span class="muted">(px，0=不限制)</span></label>
+          <div class="range-row">
+            <input type="range" id="maxDim" min="0" max="4000" value="1920" step="80">
+            <span class="rv" id="maxDimVal">1920</span>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>输出格式</label>
+        <select class="select" id="format" style="max-width:220px">
+          <option value="image/jpeg">JPEG（体积小）</option>
+          <option value="image/png">PNG（无损）</option>
+          <option value="image/webp">WebP（最佳压缩）</option>
+        </select>
+      </div>
+
+      <div class="result-stats">
+        <div class="stat"><div class="n" id="origSize">-</div><div class="l">原始大小</div></div>
+        <div class="stat"><div class="n" id="newSize">-</div><div class="l">压缩后</div></div>
+        <div class="stat"><div class="n" id="ratio">-</div><div class="l">压缩率</div></div>
+      </div>
+
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:22px;align-items:flex-start">
+        <div style="flex:1;min-width:200px">
+          <p class="muted" style="font-size:13px;margin-bottom:8px">原图</p>
+          <img id="origImg" style="max-width:100%;border-radius:10px;border:1px solid var(--border);max-height:300px;object-fit:contain;background:var(--bg-soft)">
+        </div>
+        <div style="flex:1;min-width:200px">
+          <p class="muted" style="font-size:13px;margin-bottom:8px">压缩后</p>
+          <img id="compImg" style="max-width:100%;border-radius:10px;border:1px solid var(--border);max-height:300px;object-fit:contain;background:var(--bg-soft)">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="dlBtn">下载压缩图片</button>
+        <button class="btn btn-ghost" id="resetBtn">重新选择</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>图片压缩工具说明</h2>
+    <p>本工具帮助你在不显著损失画质的前提下，减小图片文件体积，适用于网页上传、邮件附件、社交分享等场景。</p>
+    <h3>使用方法</h3>
+    <ol>
+      <li>点击或拖拽上传图片（支持 JPG、PNG、WebP）。</li>
+      <li>拖动滑块调整压缩质量（数值越低体积越小）。</li>
+      <li>设置最大边长，超过该尺寸的图片会等比缩小（设为 0 则不缩放）。</li>
+      <li>选择输出格式后预览效果，满意后点击下载。</li>
+    </ol>
+    <h3>格式建议</h3>
+    <ul>
+      <li><strong>JPEG</strong>：适合照片，体积小，不支持透明。</li>
+      <li><strong>PNG</strong>：适合图标、截图，支持透明，体积较大。</li>
+      <li><strong>WebP</strong>：现代格式，兼顾画质与体积，推荐用于网页。</li>
+    </ul>
+    <h3>隐私保护</h3>
+    <p>图片压缩全程在你的浏览器中完成，不会上传到任何服务器，请放心使用。</p>
+  </div>
+</section>
+
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var dz=document.getElementById('dropzone'),fileInput=document.getElementById('fileInput'),
+      controls=document.getElementById('controls'),
+      quality=document.getElementById('quality'),qualityVal=document.getElementById('qualityVal'),
+      maxDim=document.getElementById('maxDim'),maxDimVal=document.getElementById('maxDimVal'),
+      format=document.getElementById('format'),
+      origImg=document.getElementById('origImg'),compImg=document.getElementById('compImg'),
+      origSizeEl=document.getElementById('origSize'),newSizeEl=document.getElementById('newSize'),ratioEl=document.getElementById('ratio'),
+      dlBtn=document.getElementById('dlBtn'),resetBtn=document.getElementById('resetBtn'),
+      currentBlob=null,currentName='compressed';
+
+  function fmt(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';return (b/1048576).toFixed(2)+' MB';}
+
+  dz.addEventListener('click',function(){fileInput.click();});
+  dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('drag');});
+  dz.addEventListener('dragleave',function(){dz.classList.remove('drag');});
+  dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('drag');if(e.dataTransfer.files[0])handle(e.dataTransfer.files[0]);});
+  fileInput.addEventListener('change',function(){if(fileInput.files[0])handle(fileInput.files[0]);});
+
+  function handle(file){
+    if(!file.type.startsWith('image/')){toast('请选择图片文件');return;}
+    currentName=file.name.replace(/\.[^.]+$/,'');
+    var reader=new FileReader();
+    reader.onload=function(){
+      origImg.src=reader.result;
+      origSizeEl.textContent=fmt(file.size);
+      origSizeEl.dataset.bytes=file.size;
+      controls.classList.remove('hidden');
+      compress();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function compress(){
+    if(!origImg.src)return;
+    var img=new Image();
+    img.onload=function(){
+      var q=parseInt(quality.value)/100,md=parseInt(maxDim.value);
+      var w=img.width,h=img.height;
+      if(md>0 && Math.max(w,h)>md){var s=md/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+      var canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+      var ctx=canvas.getContext('2d');
+      ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+      ctx.drawImage(img,0,0,w,h);
+      var fmtType=format.value;
+      canvas.toBlob(function(blob){
+        if(!blob){toast('压缩失败');return;}
+        currentBlob=blob;
+        compImg.src=URL.createObjectURL(blob);
+        var nb=blob.size,ob=parseFloat(origSizeEl.dataset.bytes);
+        newSizeEl.textContent=fmt(nb);
+        var r=((1-nb/ob)*100);
+        ratioEl.textContent=(r>0?'↓ ':'↑ ')+Math.abs(r).toFixed(0)+'%';
+        ratioEl.style.color=r>0?'var(--green)':'var(--red)';
+      },fmtType,q);
+    };
+    img.src=origImg.src;
+  }
+
+  quality.addEventListener('input',function(){qualityVal.textContent=quality.value;compress();});
+  maxDim.addEventListener('input',function(){maxDimVal.textContent=maxDim.value;compress();});
+  format.addEventListener('change',compress);
+
+  dlBtn.addEventListener('click',function(){
+    if(!currentBlob){toast('请先上传图片');return;}
+    var ext=format.value==='image/jpeg'?'jpg':(format.value==='image/png'?'png':'webp');
+    downloadBlob(currentName+'-compressed.'+ext,currentBlob);
+  });
+  resetBtn.addEventListener('click',function(){controls.classList.add('hidden');fileInput.value='';dz.scrollIntoView({behavior:'smooth'});});
+})();
+</script>
+</body>
+</html>

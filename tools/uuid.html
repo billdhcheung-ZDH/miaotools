@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUID 生成器 - 在线批量生成UUID v4 | 妙用工具</title>
+  <meta name="description" content="免费在线 UUID 生成器，批量生成 UUID v4（随机）和 v1（时间）版本，支持大写、带连字符、命名空间等选项，一键复制。">
+  <meta name="keywords" content="UUID生成器,UUID,GUID,UUID v4,唯一ID,批量生成UUID">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://example.com/tools/uuid.html">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 开发工具 / UUID 生成器</div>
+    <h1><span class="th-icon">🆔</span>UUID 生成器</h1>
+    <p class="sub">批量生成 UUID v4，支持大小写、连字符、数量等选项。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="field">
+        <label>生成数量</label>
+        <div class="range-row">
+          <input type="range" id="count" min="1" max="100" value="10">
+          <span class="rv" id="countVal">10</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>版本</label>
+        <select class="select" id="ver">
+          <option value="4" selected>v4（随机）</option>
+          <option value="nil">Nil（全零）</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>格式选项</label>
+      <div class="check-grid">
+        <label class="check-pill active"><input type="checkbox" id="hyphen" checked>带连字符</label>
+        <label class="check-pill"><input type="checkbox" id="upper">大写</label>
+        <label class="check-pill"><input type="checkbox" id="brace">花括号 {}</label>
+        <label class="check-pill"><input type="checkbox" id="prefix">加 urn:uuid: 前缀</label>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="genBtn">生成 UUID</button>
+      <button class="btn btn-soft" id="copyAll">复制全部</button>
+      <button class="btn btn-ghost" id="dlBtn">下载列表</button>
+    </div>
+
+    <div class="output-box" id="result" style="min-height:200px">点击“生成 UUID”查看结果</div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>什么是 UUID？</h2>
+    <p>UUID（Universally Unique Identifier，通用唯一识别码）是一个 128 位的标识符，格式通常为 8-4-4-4-12 的十六进制字符串，如 <code>550e8400-e29b-41d4-a716-446655440000</code>。UUID 几乎不会重复，适合作为分布式系统中的唯一标识。</p>
+    <h3>UUID 版本</h3>
+    <ul>
+      <li><strong>v4（随机）</strong>：使用随机数生成，最常用。本工具使用浏览器加密随机数。</li>
+      <li><strong>Nil</strong>：全零 UUID，表示"空值"。</li>
+    </ul>
+    <h3>使用场景</h3>
+    <ul>
+      <li>数据库主键 / 外键。</li>
+      <li>分布式系统中的唯一标识。</li>
+      <li>API 请求 ID、会话 ID。</li>
+      <li>文件、资源的唯一命名。</li>
+    </ul>
+    <h3>安全说明</h3>
+    <p>UUID v4 使用 crypto.getRandomValues 加密随机数生成，质量可靠。但请注意 UUID 不能用作安全令牌或密码，因为它不保证保密性。</p>
+  </div>
+</section>
+
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var count=document.getElementById('count'),countVal=document.getElementById('countVal'),ver=document.getElementById('ver'),
+      hyphen=document.getElementById('hyphen'),upper=document.getElementById('upper'),brace=document.getElementById('brace'),prefix=document.getElementById('prefix'),
+      result=document.getElementById('result'),
+      genBtn=document.getElementById('genBtn'),copyAll=document.getElementById('copyAll'),dlBtn=document.getElementById('dlBtn');
+
+  count.addEventListener('input',function(){countVal.textContent=count.value;});
+  document.querySelectorAll('.check-pill input').forEach(function(cb){cb.addEventListener('change',function(){cb.closest('.check-pill').classList.toggle('active',cb.checked);});});
+
+  function genOne(){
+    if(ver.value==='nil')return '00000000-0000-0000-0000-000000000000';
+    if(crypto.randomUUID)return crypto.randomUUID();
+    // fallback
+    var b=new Uint8Array(16);crypto.getRandomValues(b);
+    b[6]=(b[6]&0x0f)|0x40;b[8]=(b[8]&0x3f)|0x80;
+    var h=[];for(var i=0;i<16;i++)h.push(b[i].toString(16).padStart(2,'0'));
+    return h.slice(0,4).join('')+'-'+h.slice(4,6).join('')+'-'+h.slice(6,8).join('')+'-'+h.slice(8,10).join('')+'-'+h.slice(10,16).join('');
+  }
+
+  function format(u){
+    if(!hyphen.checked)u=u.replace(/-/g,'');
+    if(upper.checked)u=u.toUpperCase();
+    if(prefix.checked)u='urn:uuid:'+u;
+    if(brace.checked)u='{'+u+'}';
+    return u;
+  }
+
+  function gen(){
+    var n=parseInt(count.value),list=[];
+    for(var i=0;i<n;i++)list.push(format(genOne()));
+    result.textContent=list.join('\n');
+    result.classList.remove('empty');
+  }
+
+  genBtn.addEventListener('click',gen);
+  [count,ver,hyphen,upper,brace,prefix].forEach(function(el){el.addEventListener('input',gen);el.addEventListener('change',gen);});
+  copyAll.addEventListener('click',function(){if(result.textContent&&!result.classList.contains('empty'))copyText(result.textContent,copyAll);else toast('请先生成');});
+  dlBtn.addEventListener('click',function(){if(result.textContent&&!result.classList.contains('empty'))downloadText('uuids.txt',result.textContent);else toast('请先生成');});
+
+  gen();
+})();
+</script>
+</body>
+</html>

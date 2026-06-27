@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字数统计 - 在线字符/单词/行数统计工具 | 妙用工具</title>
+  <meta name="description" content="免费在线字数统计工具，实时统计字符数、单词数、行数、段落数，自动估算阅读时间，支持中英文混合统计。写作、论文、自媒体好帮手。">
+  <meta name="keywords" content="字数统计,字符统计,单词统计,行数统计,阅读时间,字数计算">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://example.com/tools/word-counter.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"字数统计","applicationCategory":"UtilityApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 文本工具 / 字数统计</div>
+    <h1><span class="th-icon">🔢</span>字数统计</h1>
+    <p class="sub">实时统计字符、单词、行数、段落，自动估算阅读时间。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div class="field">
+      <label>输入文本</label>
+      <textarea class="textarea" id="input" rows="10" placeholder="在此粘贴或输入文字，统计数据实时更新…">妙用工具是一个免费的在线工具集合。
+你可以在浏览器中直接使用，无需安装任何软件。
+
+Type your text here to count words and characters instantly.</textarea>
+    </div>
+
+    <div class="result-stats">
+      <div class="stat"><div class="n" id="chars">0</div><div class="l">字符（含空格）</div></div>
+      <div class="stat"><div class="n" id="charsNoSpace">0</div><div class="l">字符（不含空格）</div></div>
+      <div class="stat"><div class="n" id="words">0</div><div class="l">单词数</div></div>
+      <div class="stat"><div class="n" id="cnChars">0</div><div class="l">中文字数</div></div>
+      <div class="stat"><div class="n" id="lines">0</div><div class="l">行数</div></div>
+      <div class="stat"><div class="n" id="paras">0</div><div class="l">段落数</div></div>
+      <div class="stat"><div class="n" id="readTime">0</div><div class="l">阅读时间（分钟）</div></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="clearBtn">清空</button>
+      <button class="btn btn-ghost" id="copyBtn">复制文本</button>
+    </div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>字数统计工具说明</h2>
+    <p>本工具可实时统计文本的各项指标，适用于论文写作、自媒体排版、社交媒体字数限制检查等场景。</p>
+    <h3>统计指标说明</h3>
+    <ul>
+      <li><strong>字符（含空格）</strong>：文本中所有字符的总数，包括空格和换行。</li>
+      <li><strong>字符（不含空格）</strong>：去除空格后的字符数。</li>
+      <li><strong>单词数</strong>：以空格分隔的英文单词数量（中文不计入单词）。</li>
+      <li><strong>中文字数</strong>：文本中汉字的数量，常用于中文稿件字数统计。</li>
+      <li><strong>行数 / 段落数</strong>：以换行符分隔的行数与段落（空行分隔）数。</li>
+      <li><strong>阅读时间</strong>：按中文 400 字/分钟、英文 200 词/分钟估算。</li>
+    </ul>
+    <h3>使用场景</h3>
+    <ul>
+      <li>论文、报告字数要求检查。</li>
+      <li>微博、小红书、朋友圈字数限制。</li>
+      <li>公众号文章排版参考。</li>
+      <li>翻译、校对工作量估算。</li>
+    </ul>
+  </div>
+</section>
+
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var input=document.getElementById('input'),
+      chars=document.getElementById('chars'),charsNoSpace=document.getElementById('charsNoSpace'),
+      words=document.getElementById('words'),cnChars=document.getElementById('cnChars'),
+      lines=document.getElementById('lines'),paras=document.getElementById('paras'),readTime=document.getElementById('readTime'),
+      clearBtn=document.getElementById('clearBtn'),copyBtn=document.getElementById('copyBtn');
+
+  function count(){
+    var t=input.value;
+    chars.textContent=t.length;
+    charsNoSpace.textContent=t.replace(/\s/g,'').length;
+    // 单词：英文单词 + 中文字符各自计数；这里"单词数"计英文单词
+    var enWords=(t.match(/[a-zA-Z0-9]+/g)||[]).length;
+    var cn=(t.match(/[\u4e00-\u9fa5]/g)||[]).length;
+    words.textContent=enWords;
+    cnChars.textContent=cn;
+    lines.textContent=t.length?t.split('\n').length:0;
+    paras.textContent=t.length?t.split(/\n\s*\n/).filter(function(s){return s.trim();}).length:0;
+    // 阅读时间：中文400字/分 + 英文200词/分
+    var min=(cn/400)+(enWords/200);
+    readTime.textContent=min<1?'<1':Math.ceil(min);
+  }
+
+  input.addEventListener('input',count);
+  clearBtn.addEventListener('click',function(){input.value='';count();});
+  copyBtn.addEventListener('click',function(){if(input.value)copyText(input.value,copyBtn);});
+  count();
+})();
+</script>
+</body>
+</html>

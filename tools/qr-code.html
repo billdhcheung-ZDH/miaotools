@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>二维码生成器 - 免费在线生成自定义二维码 | 妙用工具</title>
+  <meta name="description" content="免费在线二维码生成器，输入文本或网址即可生成二维码，支持自定义颜色、尺寸和容错等级，可下载高清 PNG 图片。数据本地生成，安全可靠。">
+  <meta name="keywords" content="二维码生成器,QR码生成,在线二维码,免费二维码,二维码制作">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://example.com/tools/qr-code.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"二维码生成器","applicationCategory":"UtilityApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 图片工具 / 二维码生成器</div>
+    <h1><span class="th-icon">🔳</span>二维码生成器</h1>
+    <p class="sub">输入文本或网址，生成可自定义颜色与尺寸的二维码，支持下载高清 PNG。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div class="field">
+      <label for="qrInput">输入内容（文本 / 网址 / 文字）</label>
+      <textarea class="textarea" id="qrInput" rows="3" placeholder="例如：https://example.com 或任意文字内容">https://example.com</textarea>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="field">
+      <div>
+        <label>尺寸 <span class="muted">(px)</span></label>
+        <div class="range-row">
+          <input type="range" id="qrSize" min="128" max="800" value="320" step="16">
+          <span class="rv" id="qrSizeVal">320</span>
+        </div>
+      </div>
+      <div>
+        <label>容错等级</label>
+        <select class="select" id="qrLevel">
+          <option value="L">L - 低 (7%)</option>
+          <option value="M" selected>M - 中 (15%)</option>
+          <option value="Q">Q - 较高 (25%)</option>
+          <option value="H">H - 高 (30%)</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="field">
+      <div>
+        <label>前景色</label>
+        <input type="color" class="input" id="qrFg" value="#1a1f36" style="height:44px;padding:4px">
+      </div>
+      <div>
+        <label>背景色</label>
+        <input type="color" class="input" id="qrBg" value="#ffffff" style="height:44px;padding:4px">
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="genBtn">生成二维码</button>
+      <button class="btn btn-ghost" id="dlBtn">下载 PNG</button>
+    </div>
+
+    <div style="text-align:center;margin-top:26px" id="qrResult">
+      <div class="output-box empty" id="qrPlaceholder">点击“生成二维码”查看结果</div>
+      <canvas id="qrCanvas" class="hidden" style="max-width:100%;border-radius:10px;border:1px solid var(--border)"></canvas>
+    </div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>二维码生成器使用说明</h2>
+    <p>本工具可免费生成二维码（QR Code），支持将网址、文本、Wi-Fi、联系方式等信息编码为二维码图片。</p>
+    <h3>如何使用？</h3>
+    <ol>
+      <li>在输入框中填写要编码的内容，如网址或文字。</li>
+      <li>调整尺寸、容错等级、前景色和背景色。</li>
+      <li>点击“生成二维码”即可实时预览。</li>
+      <li>点击“下载 PNG”保存高清二维码图片。</li>
+    </ol>
+    <h3>容错等级是什么？</h3>
+    <p>容错等级表示二维码在部分损坏或遮挡时仍可被识别的能力。等级越高，可遮挡面积越大，但二维码越复杂。一般用途选 M 即可；若要在二维码中央放置 Logo，建议选 H。</p>
+    <h3>安全说明</h3>
+    <p>二维码完全在你的浏览器中本地生成，内容不会被上传到服务器，可放心处理敏感信息。</p>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var input=document.getElementById('qrInput'),
+      size=document.getElementById('qrSize'),sizeVal=document.getElementById('qrSizeVal'),
+      level=document.getElementById('qrLevel'),fg=document.getElementById('qrFg'),bg=document.getElementById('qrBg'),
+      canvas=document.getElementById('qrCanvas'),placeholder=document.getElementById('qrPlaceholder'),
+      genBtn=document.getElementById('genBtn'),dlBtn=document.getElementById('dlBtn');
+
+  size.addEventListener('input',function(){sizeVal.textContent=size.value;});
+
+  function gen(){
+    var text=input.value.trim();
+    if(!text){toast('请输入内容');return;}
+    var s=parseInt(size.value);
+    // qrcodejs 渲染到临时容器，再转 canvas
+    var holder=document.createElement('div');
+    var qr=new QRCode(holder,{width:s,height:s,colorDark:fg.value,colorLight:bg.value,correctLevel:QRCode.CorrectLevel[level.value]});
+    setTimeout(function(){
+      var img=holder.querySelector('img')||holder.querySelector('canvas');
+      var src=img?(img.tagName==='IMG'?img.src:img.toDataURL()):null;
+      if(!src){var c=holder.querySelector('canvas');if(c)src=c.toDataURL();}
+      var im=new Image();
+      im.onload=function(){
+        canvas.width=s;canvas.height=s;
+        var ctx=canvas.getContext('2d');
+        ctx.fillStyle=bg.value;ctx.fillRect(0,0,s,s);
+        ctx.drawImage(im,0,0,s,s);
+        canvas.classList.remove('hidden');placeholder.classList.add('hidden');
+      };
+      im.src=src;
+    },120);
+  }
+
+  genBtn.addEventListener('click',gen);
+  input.addEventListener('input',function(){if(!canvas.classList.contains('hidden'))gen();});
+  [size,level,fg,bg].forEach(function(el){el.addEventListener('change',function(){if(!canvas.classList.contains('hidden'))gen();});});
+
+  dlBtn.addEventListener('click',function(){
+    if(canvas.classList.contains('hidden')){toast('请先生成二维码');return;}
+    canvas.toBlob(function(blob){downloadBlob('qrcode.png',blob);},'image/png');
+  });
+
+  gen();
+})();
+</script>
+</body>
+</html>

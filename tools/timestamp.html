@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>时间戳转换 - Unix时间戳与日期互转工具 | 妙用工具</title>
+  <meta name="description" content="免费在线 Unix 时间戳转换工具，支持时间戳与日期互转、毫秒/秒切换、多时区显示、获取当前时间戳。开发调试必备。">
+  <meta name="keywords" content="时间戳转换,Unix时间戳,时间戳,timestamp,时间戳转日期,日期转时间戳">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://example.com/tools/timestamp.html">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 开发工具 / 时间戳转换</div>
+    <h1><span class="th-icon">⏰</span>时间戳转换</h1>
+    <p class="sub">Unix 时间戳与日期互转，支持毫秒/秒、多时区，实时显示当前时间。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div class="output-box" style="text-align:center;font-family:var(--font);font-size:15px">
+      <span class="muted">当前时间戳：</span><strong id="nowTs" style="font-family:var(--mono);font-size:18px;color:var(--primary)">-</strong>
+      <span class="muted" style="margin-left:16px">当前时间：</span><strong id="nowDate">-</strong>
+      <button class="btn btn-ghost" id="copyNow" style="margin-left:16px">复制时间戳</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:26px">
+      <div>
+        <h3 style="font-size:15px;margin-bottom:12px">📌 时间戳 → 日期</h3>
+        <div class="field">
+          <label>输入时间戳</label>
+          <input type="text" class="input mono" id="tsInput" placeholder="如 1719500000" value="">
+        </div>
+        <div class="field">
+          <label>单位</label>
+          <select class="select" id="tsUnit">
+            <option value="s">秒</option>
+            <option value="ms">毫秒</option>
+          </select>
+        </div>
+        <div class="output-box" id="tsResult" style="min-height:60px">转换结果</div>
+        <div class="btn-row"><button class="btn btn-primary" id="tsConv">转换</button><button class="btn btn-ghost" id="tsNow">用当前时间</button></div>
+      </div>
+
+      <div>
+        <h3 style="font-size:15px;margin-bottom:12px">📆 日期 → 时间戳</h3>
+        <div class="field">
+          <label>选择日期时间</label>
+          <input type="datetime-local" class="input" id="dateInput" step="1">
+        </div>
+        <div class="field">
+          <label>时区</label>
+          <select class="select" id="tz">
+            <option value="local" selected>本地时区</option>
+            <option value="utc">UTC</option>
+          </select>
+        </div>
+        <div class="output-box" id="dateResult" style="min-height:60px">转换结果</div>
+        <div class="btn-row"><button class="btn btn-primary" id="dateConv">转换</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>时间戳转换说明</h2>
+    <p>Unix 时间戳是从 1970 年 1 月 1 日 00:00:00 UTC 开始所经过的秒数（或毫秒数），是程序中记录时间的通用方式。</p>
+    <h3>秒级与毫秒级</h3>
+    <ul>
+      <li><strong>秒级</strong>：10 位数字，如 1719500000，常见于 Linux/PHP。</li>
+      <li><strong>毫秒级</strong>：13 位数字，如 1719500000000，常见于 Java/JavaScript。</li>
+    </ul>
+    <h3>使用场景</h3>
+    <ul>
+      <li>调试 API 返回的时间字段。</li>
+      <li>数据库时间字段的转换与对照。</li>
+      <li>日志分析中时间戳的可读化。</li>
+    </ul>
+  </div>
+</section>
+
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var nowTs=document.getElementById('nowTs'),nowDate=document.getElementById('nowDate'),
+      tsInput=document.getElementById('tsInput'),tsUnit=document.getElementById('tsUnit'),tsResult=document.getElementById('tsResult'),
+      dateInput=document.getElementById('dateInput'),tz=document.getElementById('tz'),dateResult=document.getElementById('dateResult');
+
+  function pad(n){return n<10?'0'+n:n;}
+  function fmtDate(d){
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  }
+  function toLocalInput(d){
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  }
+
+  function tick(){
+    var now=new Date();
+    nowTs.textContent=Math.floor(now.getTime()/1000);
+    nowDate.textContent=fmtDate(now);
+  }
+  tick();setInterval(tick,1000);
+
+  function tsConv(){
+    var v=tsInput.value.trim();
+    if(!v||!/^\d+$/.test(v)){tsResult.textContent='请输入有效的数字时间戳';tsResult.style.color='var(--red)';return;}
+    var ms=tsUnit.value==='s'?parseInt(v)*1000:parseInt(v);
+    var d=new Date(ms);
+    if(isNaN(d.getTime())){tsResult.textContent='无效时间戳';return;}
+    tsResult.style.color='';
+    tsResult.textContent=fmtDate(d)+' (本地)\n'+d.toUTCString()+'\n'+d.toISOString();
+  }
+  document.getElementById('tsConv').addEventListener('click',tsConv);
+  document.getElementById('tsNow').addEventListener('click',function(){tsInput.value=Math.floor(Date.now()/1000);tsUnit.value='s';tsConv();});
+  tsInput.addEventListener('input',tsConv);tsUnit.addEventListener('change',tsConv);
+
+  function dateConv(){
+    if(!dateInput.value){dateResult.textContent='请选择日期时间';return;}
+    var d=new Date(dateInput.value);
+    if(isNaN(d.getTime())){dateResult.textContent='无效日期';return;}
+    var s=Math.floor(d.getTime()/1000),ms=d.getTime();
+    dateResult.textContent='秒级：'+s+'\n毫秒级：'+ms+'\nUTC：'+d.toISOString();
+  }
+  document.getElementById('dateConv').addEventListener('click',dateConv);
+  dateInput.value=toLocalInput(new Date());dateConv();
+
+  document.getElementById('copyNow').addEventListener('click',function(){copyText(nowTs.textContent,this);});
+  tsConv();
+})();
+</script>
+</body>
+</html>
