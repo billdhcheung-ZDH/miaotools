@@ -106,10 +106,10 @@
 
   function tsConv(){
     var v=tsInput.value.trim();
-    if(!v||!/^\d+$/.test(v)){tsResult.textContent='请输入有效的数字时间戳';tsResult.style.color='var(--red)';return;}
+    if(!v||!/^\d+$/.test(v)){tsResult.textContent='请输入有效的数字时间戳';tsResult.style.color='#dc2626';return;}
     var ms=tsUnit.value==='s'?parseInt(v)*1000:parseInt(v);
     var d=new Date(ms);
-    if(isNaN(d.getTime())){tsResult.textContent='无效时间戳';return;}
+    if(isNaN(d.getTime())){tsResult.textContent='无效时间戳';tsResult.style.color='#dc2626';return;}
     tsResult.style.color='';
     tsResult.textContent=fmtDate(d)+' (本地)\n'+d.toUTCString()+'\n'+d.toISOString();
   }

@@ -92,8 +92,9 @@
   function setStatus(cls,msg){
     status.className='output-box'+(cls?'':' empty');
     status.textContent=msg;
-    status.style.color=cls==='err'?'var(--red)':(cls==='ok'?'var(--green)':'');
-    status.style.fontFamily=cls?'var(--mono)':'var(--font)';
+    if(cls==='err'){status.style.color='#dc2626';status.style.fontFamily='Consolas,monospace';}
+    else if(cls==='ok'){status.style.color='#16a34a';status.style.fontFamily='Consolas,monospace';}
+    else{status.style.color='';status.style.fontFamily='';}
   }
 
   function parse(v){

@@ -64,8 +64,8 @@
     </div>
 
     <div style="text-align:center;margin-top:26px" id="qrResult">
-      <div class="output-box empty" id="qrPlaceholder">点击“生成二维码”查看结果</div>
-      <canvas id="qrCanvas" class="hidden" style="max-width:100%;border-radius:10px;border:1px solid var(--border)"></canvas>
+      <div class="output-box empty" id="qrPlaceholder">点击"生成二维码"查看结果</div>
+      <canvas id="qrCanvas" class="hidden" style="max-width:100%;border-radius:10px;border:1px solid #e6e9f0"></canvas>
     </div>
   </div>
 
@@ -101,38 +101,108 @@
   size.addEventListener('input',function(){sizeVal.textContent=size.value;});
 
   function gen(){
-    var text=input.value.trim();
-    if(!text){toast('请输入内容');return;}
-    var s=parseInt(size.value);
-    // qrcodejs 渲染到临时容器，再转 canvas
-    var holder=document.createElement('div');
-    var qr=new QRCode(holder,{width:s,height:s,colorDark:fg.value,colorLight:bg.value,correctLevel:QRCode.CorrectLevel[level.value]});
-    setTimeout(function(){
-      var img=holder.querySelector('img')||holder.querySelector('canvas');
-      var src=img?(img.tagName==='IMG'?img.src:img.toDataURL()):null;
-      if(!src){var c=holder.querySelector('canvas');if(c)src=c.toDataURL();}
-      var im=new Image();
-      im.onload=function(){
-        canvas.width=s;canvas.height=s;
-        var ctx=canvas.getContext('2d');
-        ctx.fillStyle=bg.value;ctx.fillRect(0,0,s,s);
-        ctx.drawImage(im,0,0,s,s);
-        canvas.classList.remove('hidden');placeholder.classList.add('hidden');
-      };
-      im.src=src;
-    },120);
+    try {
+      var text=input.value.trim();
+      if(!text){toast('请输入内容');return;}
+      if(typeof QRCode==='undefined'){toast('QR码库加载失败，请刷新页面重试');return;}
+      
+      canvas.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+      placeholder.textContent='正在生成…';
+      placeholder.classList.remove('empty');
+      
+      var s=parseInt(size.value);
+      var holder=document.createElement('div');
+      holder.style.position='absolute';
+      holder.style.left='-9999px';
+      document.body.appendChild(holder);
+      
+      var qr=new QRCode(holder,{
+        width:s,height:s,
+        colorDark:fg.value,colorLight:bg.value,
+        correctLevel:QRCode.CorrectLevel[level.value]
+      });
+      
+      // QRCode.js renders asynchronously, use a longer delay + retry
+      var attempts=0;
+      function tryRender(){
+        try {
+          var img=holder.querySelector('img');
+          var holderCanvas=holder.querySelector('canvas');
+          var src=null;
+          
+          if(img){src=img.src;}
+          else if(holderCanvas){src=holderCanvas.toDataURL();}
+          
+          if(src){
+            var im=new Image();
+            im.onload=function(){
+              canvas.width=s;canvas.height=s;
+              var ctx=canvas.getContext('2d');
+              ctx.fillStyle=bg.value;ctx.fillRect(0,0,s,s);
+              ctx.drawImage(im,0,0,s,s);
+              canvas.classList.remove('hidden');
+              placeholder.classList.add('hidden');
+              document.body.removeChild(holder);
+            };
+            im.onerror=function(){
+              if(attempts<5){attempts++;setTimeout(tryRender,200);return;}
+              placeholder.textContent='二维码渲染失败，请重试';
+              document.body.removeChild(holder);
+            };
+            im.src=src;
+          } else {
+            if(attempts<5){attempts++;setTimeout(tryRender,200);}
+            else{
+              placeholder.textContent='二维码生成失败，请重试';
+              document.body.removeChild(holder);
+            }
+          }
+        } catch(e){
+          if(attempts<5){attempts++;setTimeout(tryRender,200);}
+          else{
+            placeholder.textContent='错误：'+e.message;
+            document.body.removeChild(holder);
+          }
+        }
+      }
+      setTimeout(tryRender,150);
+    } catch(e){
+      placeholder.classList.remove('hidden');
+      placeholder.textContent='错误：'+e.message;
+    }
   }
 
   genBtn.addEventListener('click',gen);
-  input.addEventListener('input',function(){if(!canvas.classList.contains('hidden'))gen();});
-  [size,level,fg,bg].forEach(function(el){el.addEventListener('change',function(){if(!canvas.classList.contains('hidden'))gen();});});
+  
+  var changeTimer=null;
+  [size,level,fg,bg].forEach(function(el){
+    el.addEventListener('change',function(){
+      if(!canvas.classList.contains('hidden')){
+        clearTimeout(changeTimer);
+        changeTimer=setTimeout(gen,300);
+      }
+    });
+  });
+  input.addEventListener('input',function(){
+    if(!canvas.classList.contains('hidden')){
+      clearTimeout(changeTimer);
+      changeTimer=setTimeout(gen,300);
+    }
+  });
 
   dlBtn.addEventListener('click',function(){
     if(canvas.classList.contains('hidden')){toast('请先生成二维码');return;}
-    canvas.toBlob(function(blob){downloadBlob('qrcode.png',blob);},'image/png');
+    try {
+      canvas.toBlob(function(blob){
+        if(blob)downloadBlob('qrcode.png',blob);
+        else toast('下载失败，请重试');
+      },'image/png');
+    } catch(e){toast('下载失败：'+e.message);}
   });
 
-  gen();
+  // Auto-generate on load
+  setTimeout(gen,300);
 })();
 </script>
 <footer class="site-footer"><p>© 2026 妙用工具 | <a href="https://miaotools.com.cn/privacy.html">隐私政策</a> | <a href="https://miaotools.com.cn/about.html">关于我们</a></p></footer>

@@ -125,41 +125,51 @@
   fileInput.addEventListener('change',function(){if(fileInput.files[0])handle(fileInput.files[0]);});
 
   function handle(file){
-    if(!file.type.startsWith('image/')){toast('请选择图片文件');return;}
-    currentName=file.name.replace(/\.[^.]+$/,'');
-    var reader=new FileReader();
-    reader.onload=function(){
-      origImg.src=reader.result;
-      origSizeEl.textContent=fmt(file.size);
-      origSizeEl.dataset.bytes=file.size;
-      controls.classList.remove('hidden');
-      compress();
-    };
-    reader.readAsDataURL(file);
+    try {
+      if(!file||!file.type.startsWith('image/')){toast('请选择图片文件（JPG/PNG/WebP）');return;}
+      if(file.size>20*1024*1024){toast('图片最大 20MB');return;}
+      currentName=file.name.replace(/\.[^.]+$/,'');
+      var reader=new FileReader();
+      reader.onerror=function(){toast('文件读取失败，请重试');};
+      reader.onload=function(){
+        try {
+          origImg.src=reader.result;
+          origSizeEl.textContent=fmt(file.size);
+          origSizeEl.dataset.bytes=file.size;
+          controls.classList.remove('hidden');
+          compress();
+        } catch(e){toast('处理失败：'+e.message);}
+      };
+      reader.readAsDataURL(file);
+    } catch(e){toast('文件处理错误：'+e.message);}
   }
 
   function compress(){
     if(!origImg.src)return;
     var img=new Image();
+    img.onerror=function(){toast('图片加载失败');};
     img.onload=function(){
-      var q=parseInt(quality.value)/100,md=parseInt(maxDim.value);
-      var w=img.width,h=img.height;
-      if(md>0 && Math.max(w,h)>md){var s=md/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
-      var canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
-      var ctx=canvas.getContext('2d');
-      ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
-      ctx.drawImage(img,0,0,w,h);
-      var fmtType=format.value;
-      canvas.toBlob(function(blob){
-        if(!blob){toast('压缩失败');return;}
-        currentBlob=blob;
-        compImg.src=URL.createObjectURL(blob);
-        var nb=blob.size,ob=parseFloat(origSizeEl.dataset.bytes);
-        newSizeEl.textContent=fmt(nb);
-        var r=((1-nb/ob)*100);
-        ratioEl.textContent=(r>0?'↓ ':'↑ ')+Math.abs(r).toFixed(0)+'%';
-        ratioEl.style.color=r>0?'var(--green)':'var(--red)';
-      },fmtType,q);
+      try {
+        var q=parseInt(quality.value)/100,md=parseInt(maxDim.value);
+        var w=img.width,h=img.height;
+        if(md>0&&Math.max(w,h)>md){var s=md/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        var ctx=c.getContext('2d');
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img,0,0,w,h);
+        var fmtType=format.value;
+        if(typeof c.toBlob!=='function'){toast('您的浏览器不支持此功能，请使用 Chrome/Edge/Firefox');return;}
+        c.toBlob(function(blob){
+          if(!blob){toast('压缩失败，请尝试调整参数');return;}
+          currentBlob=blob;
+          compImg.src=URL.createObjectURL(blob);
+          var nb=blob.size,ob=parseFloat(origSizeEl.dataset.bytes);
+          newSizeEl.textContent=fmt(nb);
+          var r=((1-nb/ob)*100);
+          ratioEl.textContent=(r>0?'↓ ':'↑ ')+Math.abs(r).toFixed(0)+'%';
+          ratioEl.style.color=r>0?'#16a34a':'#dc2626';
+        },fmtType,q);
+      } catch(e){toast('压缩错误：'+e.message);}
     };
     img.src=origImg.src;
   }
@@ -170,8 +180,10 @@
 
   dlBtn.addEventListener('click',function(){
     if(!currentBlob){toast('请先上传图片');return;}
-    var ext=format.value==='image/jpeg'?'jpg':(format.value==='image/png'?'png':'webp');
-    downloadBlob(currentName+'-compressed.'+ext,currentBlob);
+    try {
+      var ext=format.value==='image/jpeg'?'jpg':(format.value==='image/png'?'png':'webp');
+      downloadBlob(currentName+'-compressed.'+ext,currentBlob);
+    } catch(e){toast('下载失败：'+e.message);}
   });
   resetBtn.addEventListener('click',function(){controls.classList.add('hidden');fileInput.value='';dz.scrollIntoView({behavior:'smooth'});});
 })();
