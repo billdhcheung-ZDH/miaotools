@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文本大小写转换 - 在线大小写转换工具 | 妙用工具</title>
+  <meta name="description" content="免费在线文本大小写转换工具，支持大写、小写、首字母大写、标题格式、驼峰命名、下划线命名、常量命名等多种格式互转，一键复制。本地处理，安全可靠。">
+  <meta name="keywords" content="大小写转换,文本转换,驼峰命名,下划线命名,首字母大写,标题格式,文本工具">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://miaotools.com.cn/tools/case-converter.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"文本大小写转换","applicationCategory":"UtilityApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 文本工具 / 文本大小写转换</div>
+    <h1><span class="th-icon">🔤</span>文本大小写转换</h1>
+    <p class="sub">一键转换文本大小写，支持大写、小写、标题格式、驼峰命名等多种模式。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div class="field">
+      <label for="input">输入文本</label>
+      <textarea class="textarea" id="input" rows="6" placeholder="在此输入要转换的文本" style="font-family:var(--font)">Hello World! This is a Test.</textarea>
+    </div>
+
+    <div class="field">
+      <label>转换模式</label>
+      <div class="check-grid">
+        <label class="check-pill active"><input type="radio" name="mode" value="upper" checked>全部大写</label>
+        <label class="check-pill"><input type="radio" name="mode" value="lower">全部小写</label>
+        <label class="check-pill"><input type="radio" name="mode" value="title">标题格式</label>
+        <label class="check-pill"><input type="radio" name="mode" value="sentence">句首大写</label>
+        <label class="check-pill"><input type="radio" name="mode" value="camel">驼峰命名</label>
+        <label class="check-pill"><input type="radio" name="mode" value="pascal">帕斯卡命名</label>
+        <label class="check-pill"><input type="radio" name="mode" value="snake">下划线命名</label>
+        <label class="check-pill"><input type="radio" name="mode" value="kebab">短横线命名</label>
+        <label class="check-pill"><input type="radio" name="mode" value="constant">常量命名</label>
+        <label class="check-pill"><input type="radio" name="mode" value="alternating">交替大小写</label>
+        <label class="check-pill"><input type="radio" name="mode" value="inverse">反转大小写</label>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="convBtn">转换</button>
+      <button class="btn btn-ghost" id="clearBtn">清空</button>
+    </div>
+
+    <div class="field" style="margin-top:20px">
+      <label>输出结果</label>
+      <textarea class="textarea" id="output" rows="6" readonly placeholder="转换结果将显示在这里" style="font-family:var(--font)"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-soft" id="copyBtn">复制结果</button>
+      <button class="btn btn-ghost" id="dlBtn">下载为文件</button>
+    </div>
+
+    <div class="result-stats">
+      <div class="stat"><div class="n" id="inLen">0</div><div class="l">输入字符</div></div>
+      <div class="stat"><div class="n" id="outLen">0</div><div class="l">输出字符</div></div>
+      <div class="stat"><div class="n" id="lineCount">0</div><div class="l">行数</div></div>
+    </div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>文本大小写转换说明</h2>
+    <p>文本大小写转换是日常编程和文字处理中常见的操作。本工具支持多种转换模式，覆盖绝大多数使用场景：</p>
+    
+    <h3>基础模式</h3>
+    <ul>
+      <li><strong>全部大写</strong>：将所有字母转换为大写，如 <code>Hello</code> → <code>HELLO</code>。</li>
+      <li><strong>全部小写</strong>：将所有字母转换为小写，如 <code>Hello</code> → <code>hello</code>。</li>
+      <li><strong>标题格式</strong>：每个单词首字母大写，如 <code>hello world</code> → <code>Hello World</code>。</li>
+      <li><strong>句首大写</strong>：每个句子首字母大写，如 <code>hello. world.</code> → <code>Hello. World.</code></li>
+    </ul>
+    
+    <h3>编程命名模式</h3>
+    <ul>
+      <li><strong>驼峰命名（camelCase）</strong>：第一个单词小写，后续单词首字母大写，如 <code>hello world</code> → <code>helloWorld</code>。</li>
+      <li><strong>帕斯卡命名（PascalCase）</strong>：每个单词首字母大写，如 <code>hello world</code> → <code>HelloWorld</code>。</li>
+      <li><strong>下划线命名（snake_case）</strong>：单词间用下划线连接，全部小写，如 <code>Hello World</code> → <code>hello_world</code>。</li>
+      <li><strong>短横线命名（kebab-case）</strong>：单词间用短横线连接，全部小写，如 <code>Hello World</code> → <code>hello-world</code>。</li>
+      <li><strong>常量命名（CONSTANT_CASE）</strong>：全部大写，单词间用下划线连接，如 <code>hello world</code> → <code>HELLO_WORLD</code>。</li>
+    </ul>
+    
+    <h3>趣味模式</h3>
+    <ul>
+      <li><strong>交替大小写</strong>：字母交替使用大小写，如 <code>Hello</code> → <code>hElLo</code>。</li>
+      <li><strong>反转大小写</strong>：大写变小写，小写变大写，如 <code>Hello</code> → <code>hELLO</code>。</li>
+    </ul>
+    
+    <h3>使用场景</h3>
+    <ul>
+      <li>编程中的变量命名格式转换。</li>
+      <li>英文标题、文章标题格式化。</li>
+      <li>数据库字段名与代码变量名互转。</li>
+      <li>文本规范化处理。</li>
+    </ul>
+    
+    <p>本工具所有转换均在浏览器本地完成，不会上传任何数据，请放心使用。</p>
+  </div>
+</section>
+
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var input=document.getElementById('input'),output=document.getElementById('output'),
+      inLen=document.getElementById('inLen'),outLen=document.getElementById('outLen'),lineCount=document.getElementById('lineCount'),
+      convBtn=document.getElementById('convBtn'),clearBtn=document.getElementById('clearBtn'),
+      copyBtn=document.getElementById('copyBtn'),dlBtn=document.getElementById('dlBtn');
+
+  function getMode(){var r=document.querySelector('input[name=mode]:checked');return r?r.value:'upper';}
+
+  document.querySelectorAll('input[name=mode]').forEach(function(r){
+    r.addEventListener('change',function(){
+      r.closest('.check-pill').classList.add('active');
+      document.querySelectorAll('input[name=mode]').forEach(function(o){if(o!==r)o.closest('.check-pill').classList.remove('active');});
+      convert();
+    });
+  });
+
+  function splitWords(str){
+    return str
+      .replace(/([a-z])([A-Z])/g,'$1 $2')
+      .replace(/[_\-]+/g,' ')
+      .replace(/\s+/g,' ')
+      .trim()
+      .split(' ')
+      .filter(function(w){return w.length>0;});
+  }
+
+  function convert(){
+    var v=input.value;
+    inLen.textContent=v.length;
+    lineCount.textContent=v?v.split('\n').length:0;
+    if(!v){output.value='';outLen.textContent=0;return;}
+    var mode=getMode();
+    var result='';
+    try{
+      switch(mode){
+        case 'upper':
+          result=v.toUpperCase();
+          break;
+        case 'lower':
+          result=v.toLowerCase();
+          break;
+        case 'title':
+          result=v.replace(/\b\w/g,function(c){return c.toUpperCase();}).replace(/\B\w/g,function(c){return c.toLowerCase();});
+          break;
+        case 'sentence':
+          result=v.toLowerCase().replace(/(^\s*\w)|([.!?]\s*\w)/g,function(c){return c.toUpperCase();});
+          break;
+        case 'camel':
+          var cw=splitWords(v);
+          result=cw.map(function(w,i){return i===0?w.toLowerCase():w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join('');
+          break;
+        case 'pascal':
+          var pw=splitWords(v);
+          result=pw.map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join('');
+          break;
+        case 'snake':
+          var sw=splitWords(v);
+          result=sw.map(function(w){return w.toLowerCase();}).join('_');
+          break;
+        case 'kebab':
+          var kw=splitWords(v);
+          result=kw.map(function(w){return w.toLowerCase();}).join('-');
+          break;
+        case 'constant':
+          var cw2=splitWords(v);
+          result=cw2.map(function(w){return w.toUpperCase();}).join('_');
+          break;
+        case 'alternating':
+          var idx=0;
+          result=v.split('').map(function(c){
+            if(/[a-zA-Z]/.test(c)){
+              var r=idx%2===0?c.toLowerCase():c.toUpperCase();
+              idx++;
+              return r;
+            }
+            return c;
+          }).join('');
+          break;
+        case 'inverse':
+          result=v.split('').map(function(c){
+            if(c===c.toUpperCase()&&c!==c.toLowerCase())return c.toLowerCase();
+            if(c===c.toLowerCase()&&c!==c.toUpperCase())return c.toUpperCase();
+            return c;
+          }).join('');
+          break;
+        default:
+          result=v;
+      }
+      output.value=result;
+      outLen.textContent=result.length;
+    }catch(e){
+      output.value='\u274C 转换失败：'+e.message;
+      outLen.textContent=0;
+    }
+  }
+
+  input.addEventListener('input',convert);
+  convBtn.addEventListener('click',convert);
+  clearBtn.addEventListener('click',function(){input.value='';output.value='';inLen.textContent=0;outLen.textContent=0;lineCount.textContent=0;});
+  copyBtn.addEventListener('click',function(){if(output.value)copyText(output.value,copyBtn);});
+  dlBtn.addEventListener('click',function(){if(output.value)downloadText('converted.txt',output.value);});
+
+  convert();
+})();
+</script>
+</body>
+</html>

@@ -13,7 +13,9 @@
     { id: 'color-picker', name: '颜色工具', icon: '🎨', cat: '设计', desc: '取色、HEX/RGB/HSL 互转、调色板生成' },
     { id: 'timestamp', name: '时间戳转换', icon: '⏰', cat: '开发', desc: 'Unix 时间戳与日期互转，多时区' },
     { id: 'uuid', name: 'UUID 生成器', icon: '🆔', cat: '开发', desc: '批量生成 UUID v4，一键复制' },
-    { id: 'regex-tester', name: '正则测试', icon: '🔣', cat: '开发', desc: '实时正则匹配测试，分组高亮' }
+    { id: 'regex-tester', name: '正则测试', icon: '🔣', cat: '开发', desc: '实时正则匹配测试，分组高亮' },
+    { id: 'url-encoder', name: 'URL 编解码', icon: '🔗', cat: '编码', desc: 'URL 编码与解码互转，支持中文' },
+    { id: 'case-converter', name: '文本大小写转换', icon: '🔤', cat: '文本', desc: '大写、小写、驼峰、下划线等多种格式互转' }
   ];
 
   var CAT_ICON = { '图片': '🖼️', '文本': '📝', '编码': '🔁', '开发': '⚙️', '设计': '🎨' };
@@ -63,6 +65,7 @@
           '<a href="' + depth + 'tools/timestamp.html">时间戳转换</a>' +
           '<a href="' + depth + 'tools/uuid.html">UUID 生成器</a>' +
           '<a href="' + depth + 'tools/regex-tester.html">正则测试</a>' +
+          '<a href="' + depth + 'tools/url-encoder.html">URL 编解码</a>' +
         '</div>' +
         '<div><h4>更多</h4>' +
           '<a href="' + depth + 'index.html#about">关于我们</a>' +
