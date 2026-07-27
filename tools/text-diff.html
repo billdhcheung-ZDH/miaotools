@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文本差异对比 - 在线文本比较工具 | 妙用工具</title>
+  <meta name="description" content="免费在线文本差异对比工具，逐行比较两段文本的差异，高亮显示新增、删除和修改的行，支持忽略空白和大小写。本地处理，安全可靠。">
+  <meta name="keywords" content="文本对比,文本差异,diff,文本比较,在线比较,代码对比">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://miaotools.com.cn/tools/text-diff.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"文本差异对比","applicationCategory":"UtilityApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .diff-container{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    @media(max-width:680px){.diff-container{grid-template-columns:1fr}}
+    .diff-output{border:1px solid var(--border,#ddd);border-radius:8px;overflow:hidden;margin-top:16px}
+    .diff-header{display:flex;background:var(--bg-alt,#f5f5f5);padding:8px 12px;font-size:13px;font-weight:600;border-bottom:1px solid var(--border,#ddd)}
+    .diff-header span{flex:1}
+    .diff-body{display:grid;grid-template-columns:1fr 1fr;font-family:var(--font,monospace);font-size:13px}
+    .diff-side{white-space:pre-wrap;word-break:break-all;padding:8px 12px;line-height:1.7}
+    .diff-side.left{border-right:1px solid var(--border,#ddd)}
+    .diff-line{display:block;padding:1px 4px;border-radius:3px;min-height:1.7em}
+    .diff-line.added{background:#d4f4d4;color:#1a6b1a}
+    .diff-line.removed{background:#f4d4d4;color:#8b1a1a}
+    .diff-line.unchanged{color:var(--text-muted,#666)}
+    .diff-line.empty{color:var(--text-muted,#ccc)}
+    .diff-stats{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+    .diff-stat{padding:4px 12px;border-radius:20px;font-size:13px;font-weight:500}
+    .diff-stat.added{background:#d4f4d4;color:#1a6b1a}
+    .diff-stat.removed{background:#f4d4d4;color:#8b1a1a}
+    .diff-stat.unchanged{background:var(--bg-alt,#eee);color:var(--text-muted,#666)}
+  </style>
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 文本工具 / 文本差异对比</div>
+    <h1><span class="th-icon">📋</span>文本差异对比</h1>
+    <p class="sub">逐行比较两段文本的差异，高亮显示新增、删除和修改的行。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div class="diff-container">
+      <div class="field">
+        <label for="leftText">原始文本</label>
+        <textarea class="textarea" id="leftText" rows="10" placeholder="在此粘贴原始文本" style="font-family:var(--font)">Hello World
+This is line 2
+This is line 3
+This is line 4
+This is line 5</textarea>
+      </div>
+      <div class="field">
+        <label for="rightText">修改后文本</label>
+        <textarea class="textarea" id="rightText" rows="10" placeholder="在此粘贴修改后的文本" style="font-family:var(--font)">Hello World
+This is line 2 modified
+This is line 3
+This is a new line
+This is line 4
+This is line 5</textarea>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>选项</label>
+      <div class="check-grid">
+        <label class="check-pill"><input type="checkbox" id="ignoreWS"> 忽略空白差异</label>
+        <label class="check-pill"><input type="checkbox" id="ignoreCase"> 忽略大小写</label>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="compareBtn">比较差异</button>
+      <button class="btn btn-soft" id="swapBtn">⇅ 交换</button>
+      <button class="btn btn-ghost" id="clearBtn">清空</button>
+    </div>
+
+    <div class="diff-stats" id="diffStats" style="display:none">
+      <span class="diff-stat added" id="addedCount">新增 0 行</span>
+      <span class="diff-stat removed" id="removedCount">删除 0 行</span>
+      <span class="diff-stat unchanged" id="unchangedCount">相同 0 行</span>
+    </div>
+
+    <div class="diff-output" id="diffOutput" style="display:none">
+      <div class="diff-header">
+        <span>原始文本</span>
+        <span>修改后文本</span>
+      </div>
+      <div class="diff-body" id="diffBody"></div>
+    </div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>什么是文本差异对比？</h2>
+    <p>文本差异对比（Text Diff）是一种逐行比较两段文本并标记差异的技术。它广泛应用于代码版本控制、文档修改审阅、数据校对等场景，帮助用户快速定位两段文本之间的不同之处。</p>
+
+    <h3>对比规则</h3>
+    <ul>
+      <li><strong>逐行比较</strong>：将两段文本按行拆分，逐行进行对比。</li>
+      <li><strong>新增行</strong>（绿色）：修改后文本中新增的行，原始文本中没有。</li>
+      <li><strong>删除行</strong>（红色）：原始文本中存在但修改后被删除的行。</li>
+      <li><strong>相同行</strong>（灰色）：两段文本中都存在且内容相同的行。</li>
+    </ul>
+
+    <h3>选项说明</h3>
+    <ul>
+      <li><strong>忽略空白差异</strong>：比较时忽略行首行尾的空格和制表符差异，只比较实际文本内容。</li>
+      <li><strong>忽略大小写</strong>：比较时不区分字母大小写，如 <code>Hello</code> 和 <code>hello</code> 被视为相同。</li>
+    </ul>
+
+    <h3>使用场景</h3>
+    <ul>
+      <li>比较代码修改前后的差异。</li>
+      <li>审阅文档修改，快速定位改动部分。</li>
+      <li>核对数据录入是否正确。</li>
+      <li>比较配置文件不同版本之间的差异。</li>
+    </ul>
+
+    <p>本工具所有比较均在浏览器本地完成，不会上传任何数据，请放心使用。</p>
+  </div>
+</section>
+
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var leftText=document.getElementById('leftText'),
+      rightText=document.getElementById('rightText'),
+      ignoreWS=document.getElementById('ignoreWS'),
+      ignoreCase=document.getElementById('ignoreCase'),
+      compareBtn=document.getElementById('compareBtn'),
+      swapBtn=document.getElementById('swapBtn'),
+      clearBtn=document.getElementById('clearBtn'),
+      diffOutput=document.getElementById('diffOutput'),
+      diffBody=document.getElementById('diffBody'),
+      diffStats=document.getElementById('diffStats'),
+      addedCount=document.getElementById('addedCount'),
+      removedCount=document.getElementById('removedCount'),
+      unchangedCount=document.getElementById('unchangedCount');
+
+  function normalize(str){
+    var s=str;
+    if(ignoreWS.checked) s=s.replace(/[ \t]+/g,' ').replace(/^\s+|\s+$/gm,'');
+    if(ignoreCase.checked) s=s.toLowerCase();
+    return s;
+  }
+
+  function computeDiff(a,b){
+    var aLines=a.split('\n');
+    var bLines=b.split('\n');
+    var aNorm=a.split('\n').map(normalize);
+    var bNorm=b.split('\n').map(normalize);
+    var m=aLines.length,n=bLines.length;
+    var dp=[];
+    for(var i=0;i<=m;i++){dp[i]=[];dp[i][0]=0;}
+    for(var j=0;j<=n;j++){dp[0][j]=0;}
+    for(i=1;i<=m;i++){
+      for(j=1;j<=n;j++){
+        if(aNorm[i-1]===bNorm[j-1]) dp[i][j]=dp[i-1][j-1]+1;
+        else dp[i][j]=Math.max(dp[i-1][j],dp[i][j-1]);
+      }
+    }
+    var result=[];
+    i=m;j=n;
+    while(i>0||j>0){
+      if(i>0&&j>0&&aNorm[i-1]===bNorm[j-1]){
+        result.unshift({type:'unchanged',left:aLines[i-1],right:bLines[j-1]});
+        i--;j--;
+      }else if(j>0&&(i===0||dp[i][j-1]>=dp[i-1][j])){
+        result.unshift({type:'added',left:null,right:bLines[j-1]});
+        j--;
+      }else{
+        result.unshift({type:'removed',left:aLines[i-1],right:null});
+        i--;
+      }
+    }
+    return result;
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function compare(){
+    var a=leftText.value,b=rightText.value;
+    if(!a&&!b){diffOutput.style.display='none';diffStats.style.display='none';return;}
+    var diff=computeDiff(a,b);
+    var added=0,removed=0,unchanged=0;
+    var leftHtml='',rightHtml='';
+    diff.forEach(function(d){
+      if(d.type==='unchanged'){
+        unchanged++;
+        leftHtml+='<span class="diff-line unchanged">'+escapeHtml(d.left)+'</span>';
+        rightHtml+='<span class="diff-line unchanged">'+escapeHtml(d.right)+'</span>';
+      }else if(d.type==='added'){
+        added++;
+        leftHtml+='<span class="diff-line empty">\u00A0</span>';
+        rightHtml+='<span class="diff-line added">'+escapeHtml(d.right)+'</span>';
+      }else if(d.type==='removed'){
+        removed++;
+        leftHtml+='<span class="diff-line removed">'+escapeHtml(d.left)+'</span>';
+        rightHtml+='<span class="diff-line empty">\u00A0</span>';
+      }
+    });
+    diffBody.innerHTML='<div class="diff-side left">'+leftHtml+'</div><div class="diff-side right">'+rightHtml+'</div>';
+    addedCount.textContent='\u65B0\u589E '+added+' \u884C';
+    removedCount.textContent='\u5220\u9664 '+removed+' \u884C';
+    unchangedCount.textContent='\u76F8\u540C '+unchanged+' \u884C';
+    diffOutput.style.display='block';
+    diffStats.style.display='flex';
+  }
+
+  compareBtn.addEventListener('click',compare);
+  ignoreWS.addEventListener('change',compare);
+  ignoreCase.addEventListener('change',compare);
+  swapBtn.addEventListener('click',function(){
+    var t=leftText.value;leftText.value=rightText.value;rightText.value=t;compare();
+  });
+  clearBtn.addEventListener('click',function(){
+    leftText.value='';rightText.value='';diffOutput.style.display='none';diffStats.style.display='none';
+  });
+
+  compare();
+})();
+</script>
+</body>
+</html>

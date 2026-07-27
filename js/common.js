@@ -15,7 +15,9 @@
     { id: 'uuid', name: 'UUID 生成器', icon: '🆔', cat: '开发', desc: '批量生成 UUID v4，一键复制' },
     { id: 'regex-tester', name: '正则测试', icon: '🔣', cat: '开发', desc: '实时正则匹配测试，分组高亮' },
     { id: 'url-encoder', name: 'URL 编解码', icon: '🔗', cat: '编码', desc: 'URL 编码与解码互转，支持中文' },
-    { id: 'case-converter', name: '文本大小写转换', icon: '🔤', cat: '文本', desc: '大写、小写、驼峰、下划线等多种格式互转' }
+    { id: 'case-converter', name: '文本大小写转换', icon: '🔤', cat: '文本', desc: '大写、小写、驼峰、下划线等多种格式互转' },
+    { id: 'text-diff', name: '文本差异对比', icon: '📋', cat: '文本', desc: '逐行比较两段文本差异，高亮新增、删除行' },
+    { id: 'html-encoder', name: 'HTML实体编解码', icon: '🌐', cat: '编码', desc: 'HTML特殊字符转义与反转义，防XSS' }
   ];
 
   var CAT_ICON = { '图片': '🖼️', '文本': '📝', '编码': '🔁', '开发': '⚙️', '设计': '🎨' };
