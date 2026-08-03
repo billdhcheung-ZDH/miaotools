@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JWT 解码器 - 在线JSON Web Token解析与验证 | 妙用工具</title>
+  <meta name="description" content="免费在线 JWT (JSON Web Token) 解码器，解析 header 和 payload 字段，支持 HS256/HS384/HS512 签名验证。本地处理，开发者调试神器。">
+  <meta name="keywords" content="JWT,JSON Web Token,JWT解码,JWT解析,JWT验证,HS256,HS384,HS512,Token解析,签名验证,base64url">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://miaotools.com.cn/tools/jwt-decoder.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"JWT 解码器","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<section class="wrap tool-page">
+  <div class="tool-head">
+    <div class="crumbs"><a href="../index.html">首页</a> / 开发工具 / JWT 解码器</div>
+    <h1><span class="th-icon">🎫</span>JWT 解码器</h1>
+    <p class="sub">解析 JWT 的 header 和 payload，可选 HMAC 密钥验证签名，调试与排查 Token 神器。</p>
+  </div>
+
+  <div class="tool-panel">
+    <div class="field">
+      <label for="input">JWT Token</label>
+      <textarea class="textarea" id="input" rows="4" placeholder="粘贴 JWT 字符串，形如 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" style="font-family:var(--font);font-size:13px">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</textarea>
+    </div>
+
+    <div class="field">
+      <label for="secret">密钥（用于签名验证，可选）</label>
+      <input class="input" id="secret" type="text" placeholder="留空则不验证签名" value="your-256-bit-secret">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="parseBtn">解析 JWT</button>
+      <button class="btn btn-soft" id="sampleBtn">示例</button>
+      <button class="btn btn-ghost" id="clearBtn">清空</button>
+    </div>
+
+    <div id="statusBox" style="margin:20px 0;padding:12px 16px;border-radius:8px;display:none"></div>
+
+    <div class="field">
+      <label>Header（算法与类型）<button class="btn btn-soft" id="copyHdr" style="float:right;padding:4px 10px;font-size:12px">复制</button></label>
+      <textarea class="textarea" id="headerOut" rows="5" readonly placeholder="解析结果" style="font-family:var(--font);font-size:13px;background:#f8f9fc"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Payload（载荷数据）<button class="btn btn-soft" id="copyPld" style="float:right;padding:4px 10px;font-size:12px">复制</button></label>
+      <textarea class="textarea" id="payloadOut" rows="10" readonly placeholder="解析结果" style="font-family:var(--font);font-size:13px;background:#f8f9fc"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Signature（签名）</label>
+      <input class="input" id="signatureOut" type="text" readonly placeholder="签名（Base64URL）" style="font-family:var(--font);font-size:13px;background:#f8f9fc">
+    </div>
+
+    <div class="content-block" style="margin-top:20px;padding:16px;background:#f8f9fc;border-radius:8px">
+      <h3 style="margin:0 0 12px 0;font-size:15px">📋 标准 Claim 速查</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;font-size:13px">
+        <div><code>iss</code> - 签发者 (Issuer)</div>
+        <div><code>sub</code> - 主题 (Subject)</div>
+        <div><code>aud</code> - 受众 (Audience)</div>
+        <div><code>exp</code> - 过期时间 (Expires)</div>
+        <div><code>nbf</code> - 生效时间 (Not Before)</div>
+        <div><code>iat</code> - 签发时间 (Issued At)</div>
+        <div><code>jti</code> - 唯一标识 (JWT ID)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-slot inline"><span class="ad-label">广告位</span></div>
+
+  <div class="content-block">
+    <h2>什么是 JWT？</h2>
+    <p>JWT（JSON Web Token）是一种基于 JSON 的开放标准（RFC 7519），用于在网络应用间传递声明（claims）。它由三部分组成，用英文句点 <code>.</code> 分隔：</p>
+    <ul>
+      <li><strong>Header</strong>：描述令牌类型和签名算法，例如 <code>{"alg":"HS256","typ":"JWT"}</code>。</li>
+      <li><strong>Payload</strong>：包含声明（claims），即实际传输的数据，例如用户 ID、过期时间等。</li>
+      <li><strong>Signature</strong>：对前两部分的签名，用于验证令牌未被篡改。</li>
+    </ul>
+
+    <h2>JWT 格式示例</h2>
+    <pre style="background:#f8f9fc;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</pre>
+    <p>三部分分别是：</p>
+    <ul>
+      <li>Header → <code>{"alg":"HS256","typ":"JWT"}</code></li>
+      <li>Payload → <code>{"sub":"1234567890"}</code></li>
+      <li>Signature → HMAC-SHA256(base64url(header) + "." + base64url(payload), secret)</li>
+    </ul>
+
+    <h2>支持的签名算法</h2>
+    <ul>
+      <li><strong>HS256</strong>：HMAC + SHA-256，对称密钥，最常用。</li>
+      <li><strong>HS384</strong>：HMAC + SHA-384，更高安全性。</li>
+      <li><strong>HS512</strong>：HMAC + SHA-512，最高安全性（对称）。</li>
+    </ul>
+    <p><em>注：本工具仅支持 HMAC 系列（HS256/384/512）的签名验证。RSA（RS256/PS256）等非对称算法需要公钥，不在本工具范围内。</em></p>
+
+    <h2>使用场景</h2>
+    <ul>
+      <li><strong>登录认证</strong>：用户登录后服务器返回 JWT，前端存储并在每次请求中携带。</li>
+      <li><strong>API 授权</strong>：微服务间传递用户身份信息，避免共享 Session。</li>
+      <li><strong>单点登录（SSO）</strong>：跨域身份验证。</li>
+      <li><strong>信息交换</strong>：安全传输用户信息，签名确保完整性。</li>
+    </ul>
+
+    <h2>安全提示</h2>
+    <ul>
+      <li>JWT 本身不是加密的，Payload 仅仅做了 Base64URL 编码，<strong>不要在 Payload 中存放敏感信息</strong>（如密码）。</li>
+      <li>密钥必须妥善保管，泄露后任何人都能签发合法令牌。</li>
+      <li>生产环境应始终设置 <code>exp</code> 过期时间。</li>
+      <li>HTTP 传输应使用 HTTPS，避免令牌被窃取。</li>
+    </ul>
+
+    <p>本工具所有解析在浏览器本地完成，Token 不会被上传到服务器。</p>
+  </div>
+</section>
+
+<script src="../js/common.js"></script>
+<script>
+(function(){
+  var input=document.getElementById('input'),secret=document.getElementById('secret'),
+      headerOut=document.getElementById('headerOut'),payloadOut=document.getElementById('payloadOut'),
+      signatureOut=document.getElementById('signatureOut'),statusBox=document.getElementById('statusBox'),
+      parseBtn=document.getElementById('parseBtn'),sampleBtn=document.getElementById('sampleBtn'),
+      clearBtn=document.getElementById('clearBtn'),
+      copyHdr=document.getElementById('copyHdr'),copyPld=document.getElementById('copyPld');
+
+  function b64urlToStr(s){
+    s=s.replace(/-/g,'+').replace(/_/g,'/');
+    while(s.length%4)s+='=';
+    try{
+      var bin=atob(s);
+      // UTF-8 解码
+      var bytes=new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+      return new TextDecoder('utf-8').decode(bytes);
+    }catch(e){
+      try{return atob(s);}catch(e2){throw new Error('Base64URL 解码失败');}
+    }
+  }
+
+  function strToB64url(s){
+    var bytes=new TextEncoder().encode(s);
+    var bin='';
+    for(var i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+
+  function showStatus(type,msg){
+    statusBox.style.display='block';
+    if(type==='ok'){statusBox.style.background='#e6f9ed';statusBox.style.color='#0a7d3e';statusBox.style.borderLeft='4px solid #0a7d3e';}
+    else if(type==='err'){statusBox.style.background='#fde7e9';statusBox.style.color='#b0232d';statusBox.style.borderLeft='4px solid #b0232d';}
+    else if(type==='warn'){statusBox.style.background='#fff5d6';statusBox.style.color='#8a6d00';statusBox.style.borderLeft='4px solid #d4a800';}
+    else{statusBox.style.background='#eef2f8';statusBox.style.color='#345';statusBox.style.borderLeft='4px solid #6c7a99';}
+    statusBox.textContent=msg;
+  }
+
+  async function importHmacKey(algo,secretStr){
+    var enc=new TextEncoder();
+    return crypto.subtle.importKey(
+      'raw',enc.encode(secretStr),
+      {name:'HMAC',hash:algo},
+      false,['sign']
+    );
+  }
+
+  async function verifySignature(header,payload,signatureB64,secretStr,alg){
+    if(!secretStr){return {verified:null,reason:'未提供密钥'};}
+    if(alg!=='HS256'&&alg!=='HS384'&&alg!=='HS512'){
+      return {verified:false,reason:'本工具仅支持 HS256/HS384/HS512 算法'};
+    }
+    var hashName=alg==='HS256'?'SHA-256':alg==='HS384'?'SHA-384':'SHA-512';
+    var hashObj=hashName==='SHA-256'?{name:'SHA-256'}:hashName==='SHA-384'?{name:'SHA-384'}:{name:'SHA-512'};
+    try{
+      var key=await importHmacKey(hashObj,secretStr);
+      var enc=new TextEncoder();
+      var signInput=enc.encode(header+'.'+payload);
+      var sig=await crypto.subtle.sign('HMAC',key,signInput);
+      var sigHex=Array.from(new Uint8Array(sig)).map(function(b){return ('0'+b.toString(16)).slice(-2);}).join('');
+      // 签名部分是 base64url 编码的二进制签名，比较 hex
+      var sigB64urlBytes=signatureB64.replace(/-/g,'+').replace(/_/g,'/');
+      while(sigB64urlBytes.length%4)sigB64urlBytes+='=';
+      var sigBin=atob(sigB64urlBytes);
+      var sigBytes=new Uint8Array(sigBin.length);
+      for(var i=0;i<sigBin.length;i++)sigBytes[i]=sigBin.charCodeAt(i);
+      var sigB64Hex=Array.from(sigBytes).map(function(b){return ('0'+b.toString(16)).slice(-2);}).join('');
+      return {verified:sigHex===sigB64Hex,hex:sigHex,reason:sigHex===sigB64Hex?'签名匹配':'签名不匹配'};
+    }catch(e){
+      return {verified:false,reason:'验证失败：'+e.message};
+    }
+  }
+
+  function prettyJson(s){
+    try{
+      return JSON.stringify(JSON.parse(s),null,2);
+    }catch(e){
+      return s;
+    }
+  }
+
+  async function parse(){
+    var token=input.value.trim();
+    if(!token){showStatus('warn','请输入 JWT 字符串');return;}
+
+    var parts=token.split('.');
+    if(parts.length!==3){
+      showStatus('err','JWT 格式错误：必须包含 3 段（header.payload.signature），当前 '+parts.length+' 段');
+      headerOut.value=payloadOut.value=signatureOut.value='';
+      return;
+    }
+
+    var headerStr, payloadStr, sigB64;
+    try{headerStr=b64urlToStr(parts[0]);}catch(e){showStatus('err','Header 解析失败：'+e.message);return;}
+    try{payloadStr=b64urlToStr(parts[1]);}catch(e){showStatus('err','Payload 解析失败：'+e.message);return;}
+    sigB64=parts[2];
+
+    var header=prettyJson(headerStr);
+    var payload=prettyJson(payloadStr);
+    headerOut.value=header;
+    payloadOut.value=payload;
+    signatureOut.value=sigB64;
+
+    var headerObj;
+    try{headerObj=JSON.parse(headerStr);}catch(e){headerObj={};}
+
+    // 过期检查
+    try{
+      var pld=JSON.parse(payloadStr);
+      if(pld.exp){
+        var now=Math.floor(Date.now()/1000);
+        if(now>pld.exp){
+          showStatus('err','⛔ Token 已过期（exp: '+new Date(pld.exp*1000).toLocaleString('zh-CN')+'，当前 '+new Date().toLocaleString('zh-CN')+'）');
+        }else{
+          // 签名验证
+          if(secret.value){
+            var v=await verifySignature(parts[0],parts[1],sigB64,secret.value,headerObj.alg);
+            if(v.verified){showStatus('ok','✅ 签名验证通过（'+headerObj.alg+'）');}
+            else if(v.verified===false){showStatus('err','❌ 签名验证失败：'+v.reason);}
+          }else{
+            showStatus('ok','✅ JWT 解析成功（未验证签名，填入密钥可验证 '+headerObj.alg+'）');
+          }
+        }
+      }else{
+        if(secret.value){
+          var v=await verifySignature(parts[0],parts[1],sigB64,secret.value,headerObj.alg);
+          if(v.verified){showStatus('ok','✅ 签名验证通过（'+headerObj.alg+'，Token 无 exp 字段）');}
+          else if(v.verified===false){showStatus('err','❌ 签名验证失败：'+v.reason);}
+        }else{
+          showStatus('ok','✅ JWT 解析成功（未验证签名）');
+        }
+      }
+    }catch(e){
+      showStatus('warn','⚠️ 解析完成，但 Payload 不是合法 JSON');
+    }
+  }
+
+  parseBtn.addEventListener('click',parse);
+  copyHdr.addEventListener('click',function(){if(headerOut.value)copyText(headerOut.value,copyHdr);});
+  copyPld.addEventListener('click',function(){if(payloadOut.value)copyText(payloadOut.value,copyPld);});
+  clearBtn.addEventListener('click',function(){
+    input.value='';secret.value='';
+    headerOut.value=payloadOut.value=signatureOut.value='';
+    statusBox.style.display='none';
+  });
+
+  sampleBtn.addEventListener('click',function(){
+    input.value='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE5MTYyMzkwMjJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+    secret.value='your-256-bit-secret';
+    parse();
+  });
+})();
+</script>
+</body>
+</html>

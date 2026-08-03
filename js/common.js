@@ -17,7 +17,9 @@
     { id: 'url-encoder', name: 'URL 编解码', icon: '🔗', cat: '编码', desc: 'URL 编码与解码互转，支持中文' },
     { id: 'case-converter', name: '文本大小写转换', icon: '🔤', cat: '文本', desc: '大写、小写、驼峰、下划线等多种格式互转' },
     { id: 'text-diff', name: '文本差异对比', icon: '📋', cat: '文本', desc: '逐行比较两段文本差异，高亮新增、删除行' },
-    { id: 'html-encoder', name: 'HTML实体编解码', icon: '🌐', cat: '编码', desc: 'HTML特殊字符转义与反转义，防XSS' }
+    { id: 'html-encoder', name: 'HTML实体编解码', icon: '🌐', cat: '编码', desc: 'HTML特殊字符转义与反转义，防XSS' },
+    { id: 'hash-generator', name: 'MD5/SHA 哈希生成器', icon: '🔐', cat: '开发', tag: '热门', desc: '计算 MD5/SHA-1/SHA-256/384/512 哈希，支持文本与文件' },
+    { id: 'jwt-decoder', name: 'JWT 解码器', icon: '🎫', cat: '开发', desc: '解析 JWT header/payload，HS256/384/512 签名验证' }
   ];
 
   var CAT_ICON = { '图片': '🖼️', '文本': '📝', '编码': '🔁', '开发': '⚙️', '设计': '🎨' };
@@ -67,7 +69,12 @@
           '<a href="' + depth + 'tools/timestamp.html">时间戳转换</a>' +
           '<a href="' + depth + 'tools/uuid.html">UUID 生成器</a>' +
           '<a href="' + depth + 'tools/regex-tester.html">正则测试</a>' +
+          '<a href="' + depth + 'tools/hash-generator.html">MD5/SHA 哈希生成器</a>' +
+          '<a href="' + depth + 'tools/jwt-decoder.html">JWT 解码器</a>' +
+        '</div>' +
+        '<div><h4>编码工具</h4>' +
           '<a href="' + depth + 'tools/url-encoder.html">URL 编解码</a>' +
+          '<a href="' + depth + 'tools/html-encoder.html">HTML实体编解码</a>' +
         '</div>' +
         '<div><h4>更多</h4>' +
           '<a href="' + depth + 'index.html#about">关于我们</a>' +
